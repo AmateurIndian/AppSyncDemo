@@ -1,0 +1,190 @@
+Description: AWSAppSync Demo
+Resources:
+  GraphQLApi:
+    Type: "AWS::AppSync::GraphQLApi"
+    Properties:
+      Name: Zambia Reserve
+      AuthenticationType: AWS_IAM
+
+    AnimalsDynamoDBTableDataSource:
+        Type: "AWS::AppSync::DataSource"
+        Properties:
+        ApiId: !GetAtt GraphQLApi.ApiId
+        Name: AnimalsDynamoDBTable
+        Description: The Animal DynamoDB table in us-west-2
+        Type: AMAZON_DYNAMODB
+        ServiceRoleArn: "arn:aws:iam::YOUR_ACCOUNT_ID:role/AppSyncDemoAmazonDynamoDBRole"
+        DynamoDBConfig:
+            AwsRegion: "us-west-2"
+            TableName: "AnimalsTable"
+
+    ReserveDynamoDBTableDataSource:
+        Type: "AWS::AppSync::DataSource"
+        Properties:
+            ApiId: !GetAtt GraphQLApi.ApiId
+            Name: ReserveDynamoDBTable
+            Description: The Reserve DynamoDB table in us-west-2
+            Type: AMAZON_DYNAMODB
+            ServiceRoleArn: "arn:aws:iam::YOUR_ACCOUNT_ID:role/AppSyncDemoAmazonDynamoDBRole"
+            DynamoDBConfig:
+                AwsRegion: "us-west-2"
+                TableName: "ReservesTable"
+
+    QueryGetAnimalResolver:
+        Type: "AWS::AppSync::Resolver"
+        DependsOn: Schema
+        Properties:
+        ApiId: !GetAtt GraphQLApi.ApiId
+        TypeName: Query
+        FieldName: getAnimal
+        DataSourceName: !GetAtt AnimalsDynamoDBTableDataSource.Name
+        RequestMappingTemplate: |
+            {
+                "version" : "2017-02-28",
+                "operation" : "GetItem",
+                "key" : {
+                    "id" : $util.dynamodb.toDynamoDBJson($ctx.args.id)
+                }
+            }
+        ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+    MutationaddAnimalResolver:
+        Type: "AWS::AppSync::Resolver"
+        DependsOn: Schema
+        Properties:
+        ApiId: !GetAtt GraphQLApi.ApiId
+        TypeName: Mutation
+        FieldName: addAnimal
+        DataSourceName: !GetAtt AnimalsDynamoDBTableDataSource.Name
+        RequestMappingTemplate: |
+            {
+                "version" : "2017-02-28",
+                "operation" : "PutItem",
+                "key" : {
+                    "id": $util.dynamodb.toDynamoDBJson($context.args.id),
+                },
+                "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args)
+            }
+        ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+    QueryGetReserveResolver:
+        Type: "AWS::AppSync::Resolver"
+        DependsOn: Schema
+        Properties:
+        ApiId: !GetAtt GraphQLApi.ApiId
+        TypeName: Query
+        FieldName: getReserve
+        DataSourceName: !GetAtt ReserveDynamoDBTableDataSource.Name
+        RequestMappingTemplate: |
+            {
+                "version": "2017-02-28",
+                "operation": "GetItem",
+                "key": {
+                    "id": $util.dynamodb.toDynamoDBJson($ctx.args.id),
+                }
+            }
+        ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+    MutationaddReserveResolver:
+        Type: "AWS::AppSync::Resolver"
+        DependsOn: Schema
+        Properties:
+        ApiId: !GetAtt GraphQLApi.ApiId
+        TypeName: Mutation
+        FieldName: addReserve
+        DataSourceName: !GetAtt ReserveDynamoDBTableDataSource.Name
+        RequestMappingTemplate: |
+            {
+                "version" : "2017-02-28",
+                "operation" : "PutItem",
+                "key" : {
+                    "id": $util.dynamodb.toDynamoDBJson($context.args.id),
+                },
+                "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args)
+            }
+        ResponseMappingTemplate: "$util.toJson($ctx.result)"
+    
+    QuerygetAnimalsByReserveResolver:
+        Type: "AWS::AppSync::Resolver"
+            DependsOn: Schema
+            Properties:
+            ApiId: !GetAtt GraphQLApi.ApiId
+            TypeName: Reserve
+            FieldName: getAnimalsByReserve
+            DataSourceName: !GetAtt AnimalsDynamoDBTableDataSource.Name
+            RequestMappingTemplate: |
+                {
+                    "version" : "2017-02-28",
+                    "operation" : "Scan",
+                    "filter": {
+                        "expression": "contains(reserve, :reserve)",
+                        "expressionValues" : {
+                            ":reserve": {
+                                "S": "${context.source.id}"
+                            }
+                        }
+                    }
+                }
+            ResponseMappingTemplate: "$util.toJson($ctx.result.items)"
+
+
+  Schema:
+    Type: "AWS::AppSync::GraphQLSchema"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Definition: |
+        type Animal {
+            id: ID!
+            name: String!
+            number: Int
+            reserve: ID
+        }
+
+        type Mutation {
+            addAnimal(
+                id: ID!,
+                name: String!,
+                number: Int,
+                reserve: ID
+            ): Animal
+            
+            addReserve(
+                id: ID!, 
+                district: String!, 
+                area: Int
+            ): Reserve
+        }
+
+        type Query {
+            getAnimal(id: ID!): Animal
+            getReserve(id: ID!): Reserve
+        }
+
+        type Reserve {
+            id: ID!
+            area: Int
+            district: String
+            animals: [Animal]
+        }
+
+        schema {
+            query: Query
+            mutation: Mutation
+        }
+
+Outputs:
+  GraphQLApiARN:
+    Description: The App ID of the GraphQL endpoint.
+    Value: !Ref GraphQLApi
+  GraphQLApiId:
+    Description: The App ID of the GraphQL endpoint.
+    Value: !GetAtt GraphQLApi.ApiId
+  GraphQLApiEndpoint:
+    Description: The URL for the GraphQL endpoint.
+    Value: !GetAtt GraphQLApi.GraphQLUrl
+  PostDynamoDBTableDataSourceARN:
+    Description: The ARN for the Post DynamoDB table DataSource.
+    Value: !Ref PostDynamoDBTableDataSource
+  PostDynamoDBTableDataSourceName:
+    Description: The ARN for the Post DynamoDB table DataSource.
+    Value: !GetAtt PostDynamoDBTableDataSource.Name
