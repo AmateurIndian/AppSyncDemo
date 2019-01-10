@@ -1,0 +1,28 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  number: Int
+  reserve: ID
+}
+
+type Mutation {
+  addAnimal(id: ID!, name: String!, number: Int, reserve: ID): Animal
+  addReserve(area: Int, district: String!, id: ID!): Reserve
+}
+
+type Query {
+  getAnimal(id: ID!): Animal
+  getReserve(id: ID!): Reserve
+}
+
+type Reserve {
+  animals: [Animal]
+  area: Int
+  district: String
+  id: ID!
+}
