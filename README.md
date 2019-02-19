@@ -1,6 +1,6 @@
 # AppSyncDemo
 
-** N.B: This project in this repository corresponds to the demo project deomonstrated in my GraphQL with AppSync blog series. **
+**N.B: This project in this repository corresponds to the demo project deomonstrated in my GraphQL with AppSync blog series.**
 
 _Blog Links: [ [1](https://medium.com/thundra/the-comforts-of-graphql-with-aws-appsync-d8b36b9c67) ] [ [2](https://medium.com/thundra/up-and-running-with-graphql-using-aws-appsync-7202b1607299) ] [ [3]() ]_
 
