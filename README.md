@@ -1,10 +1,10 @@
 # AppSyncDemo
 
-**N.B: This project in this repository corresponds to the demo project deomonstrated in my GraphQL with AppSync blog series. **
+** N.B: This project in this repository corresponds to the demo project deomonstrated in my GraphQL with AppSync blog series. **
 
 _Blog Links: [ [1](https://medium.com/thundra/the-comforts-of-graphql-with-aws-appsync-d8b36b9c67) ] [ [2](https://medium.com/thundra/up-and-running-with-graphql-using-aws-appsync-7202b1607299) ] [ [3]() ]_
 
-AppSync Demo used in [Blog II](https://medium.com/thundra/detailed-serverless-monitoring-using-a-completely-automated-approach-c148fa8cfa47)
+## AppSync Demo used in [Blog II](https://medium.com/thundra/detailed-serverless-monitoring-using-a-completely-automated-approach-c148fa8cfa47)
 
 Operations:
 
@@ -33,7 +33,7 @@ addReserve(
 ): Reserve
 ```
 
-AppSync Demo used in [Blog III]()
+## AppSync Demo used in [Blog III]()
 
 Part III demonstrates using Lambda functions as data sources for your GraphQL based application. It also talks about how Thundra monitroing is necessary for quick and efficient development of your Lambda function for AppSync.
 The Lambda function can be found [here](./Lambda_Data_Source)
