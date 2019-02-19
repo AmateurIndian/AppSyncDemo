@@ -1,0 +1,33 @@
+service: animal-lambda-demo
+
+custom:
+  deploymentBucket: Your-Bucket
+  thundraApiKey: Your-API Key
+  stage: dev #Configure your stage if you want
+  region: Your-Region
+  profile: default #Configure your AWS profile if you want
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  profile: ${self:custom.profile}
+  deploymentBucket: ${self:custom.deploymentBucket}
+  memorySize: 256
+  timeout: 300
+  environment:
+      thundra_apiKey: ${self:custom.thundraApiKey}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:*
+        - dynamodb:*
+      Resource: [
+        "*"
+      ]
+
+functions:
+  animal-lambda-demo:
+    name: animal-lambda-demo
+    handler: index.handler
