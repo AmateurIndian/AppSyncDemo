@@ -33,7 +33,7 @@ addReserve(
 ): Reserve
 ```
 
-## AppSync Demo used in [Blog III]()
+## AppSync Demo used in [Blog III](https://medium.com/thundra/making-appsync-easier-with-thundra-6570994cda5b)
 
 Part III demonstrates using Lambda functions as data sources for your GraphQL based application. It also talks about how Thundra monitroing is necessary for quick and efficient development of your Lambda function for AppSync.
 The Lambda function can be found [here](./Lambda_Data_Source)
